@@ -1,6 +1,6 @@
 ﻿
 <?php
-include("fusioncharts.php");
+//include("fusioncharts.php");
 
 header('Content-Type: text/html; charset=UTF-8');
 //$file=fopen("sample.txt","r");
@@ -20,7 +20,7 @@ $final_result=array_diff_key($arrays,$krk);
 $files=fopen("output.txt","w");
 fwrite($files,print_r($final_result,true));
 fclose($files);
-$jsonEncodedData = json_encode($final_result);
+$jsonEncodedData =json_encode($final_result);
 
 $output_keys=array_keys($final_result);
 $output_values=array_values($final_result);
@@ -28,6 +28,10 @@ $output_values=array_values($final_result);
 $jsonFile=fopen("outputjson.json","w");
 fwrite($jsonFile,$jsonEncodedData);
 fclose($jsonFile);
+$filed=fopen("outputkey.json","w");
+$jsonEncodedData1 =json_encode($output_keys);
+fwrite($filed,$jsonEncodedData1);
+fclose($filed);
 
 ?>
 <html>
@@ -36,19 +40,40 @@ fclose($jsonFile);
   
 </head>
 <body>
-<p>HI <?php print_r($output_keys); ?></p>
+<p>HI <?php print_r($jsonEncodedData); ?></p>
   	<div id="chartid">This is just a replacement in case Javascript is not available or used for SEO purposes</div>
 
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
-<script>var data = [{
+<script>
+var xmlhttp = new XMLHttpRequest();
+var abc =[];
+var data=[];
+
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        myObj = JSON.parse(this.responseText);
+       // console.log(myObj);
+	   		abc=myObj;
+
+    }
+		console.log(abc);
+		 data = [{
   type: 'bar',
-  x: [20, 14, 23],
-  y: ['giraffes', 'orangutans', 'monkeys'],
+  x: abc,
+  y: [1,1,1,1],
   orientation: 'h'
 }];
 
+
+	};
+xmlhttp.open("GET", "outputkey.json", true);
+xmlhttp.send();
+
 Plotly.newPlot('myDiv', data);
+
+
+
 </script>
 </body>
 </html>
