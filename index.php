@@ -21,8 +21,8 @@ $files=fopen("output.txt","w");
 fwrite($files,print_r($final_result,true));
 fclose($files);
 $jsonEncodedData =json_encode($final_result);
-
-$output_keys=array_keys($final_result);
+$jsonArray=array();
+ $output_keys=array_keys($final_result);
 $output_values=array_values($final_result);
 						
 $jsonFile=fopen("outputjson.json","w");
@@ -30,8 +30,31 @@ fwrite($jsonFile,$jsonEncodedData);
 fclose($jsonFile);
 $filed=fopen("outputkey.json","w");
 $jsonEncodedData1 =json_encode($output_keys);
+
 fwrite($filed,$jsonEncodedData1);
 fclose($filed);
+$filed1=fopen("outputValues.json","w");
+$jsonEncodedData2 =json_encode($output_values);
+
+fwrite($filed1,$jsonEncodedData2);
+fclose($filed1);
+
+
+ for($point=0;$point<count($output_keys);$point++){
+ $jsonArrayItem = array();
+		    $jsonArrayItem['label'] = $output_keys[$point];
+		    $jsonArrayItem['value'] = $output_values[$point];
+		    //append the above created object into the main array.
+		    array_push($jsonArray, $jsonArrayItem);
+			}
+$jsonBarData =json_encode($jsonArray);
+
+$files5=fopen("outputBar.json","w");
+fwrite($files5,$jsonBarData);
+fclose($files5);
+
+
+
 
 ?>
 <html>
@@ -40,38 +63,50 @@ fclose($filed);
   
 </head>
 <body>
-<p>HI <?php print_r($jsonEncodedData); ?></p>
+<p>WORD FREQUENCY COUNTER- PRIME MINISTER OF INDIA SPEECHES</p>
   	<div id="chartid">This is just a replacement in case Javascript is not available or used for SEO purposes</div>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	  <script src="js/fusioncharts.js"></script>
+	  <script src="js/fusioncharts.charts.js"></script>
+	  <script src="js/themes/fusioncharts.theme.zune.js"></script>
+	
+  <script>
+  $(function(){
+	  $.ajax({
+	    url: 'http://localhost/WordCounter/outputBar.json',
+	    type: 'GET',
+	    success : function(data) {
+	      chartData = data;
+		  
+	      var chartProperties = {
+	        "caption": "Most Frequent Words Used By Narender Modi",
+	        "xAxisName": "Words",
+	        "yAxisName": "Frequency",
+	        "rotatevalues": "1",
+	        "theme": "zune"
+	      };
+	      apiChart = new FusionCharts({
+	        type: 'column2d',
+	        renderAt: 'chart-container',
+	        width: '11550',
+	        height: '1350',
+	        dataFormat: 'json',
+	        dataSource: {
+	          "chart": chartProperties,
+	          "data": chartData
+	        }
+	      });
+	      apiChart.render();
+	    }
+	  });
+	});
+	console.log("HI");
+  </script>
+	 
+     <div id="chart-container">FusionCharts will render here</div>
 
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
 <script>
-var xmlhttp = new XMLHttpRequest();
-var abc =[];
-var data=[];
-
-xmlhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-        myObj = JSON.parse(this.responseText);
-       // console.log(myObj);
-	   		abc=myObj;
-
-    }
-		console.log(abc);
-		 data = [{
-  type: 'bar',
-  x: abc,
-  y: [1,1,1,1],
-  orientation: 'h'
-}];
-
-
-	};
-xmlhttp.open("GET", "outputkey.json", true);
-xmlhttp.send();
-
-Plotly.newPlot('myDiv', data);
-
 
 
 </script>
